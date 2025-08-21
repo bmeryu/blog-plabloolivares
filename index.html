@@ -255,6 +255,18 @@
         </div>
     </footer>
 
+    <!-- PDF Modal -->
+    <div id="pdf-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="bg-brand-dark w-full h-full max-w-4xl max-h-[90vh] rounded-lg shadow-xl flex flex-col">
+            <div class="flex justify-end p-2">
+                <button id="close-modal-btn" class="text-brand-light hover:text-white">&times;</button>
+            </div>
+            <div class="flex-grow p-2 sm:p-4">
+                <iframe id="pdf-viewer" class="w-full h-full border-0 rounded-b-lg" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // --- Datos ---
@@ -275,6 +287,9 @@
             const articlesGrid = document.getElementById('articles-grid');
             const blogFilters = document.getElementById('blog-filters');
             const publicationsGrid = document.getElementById('publications-grid');
+            const pdfModal = document.getElementById('pdf-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const pdfViewer = document.getElementById('pdf-viewer');
             
             // --- Lógica para renderizar ---
             function renderArticles(filter = 'Todos') {
@@ -300,10 +315,11 @@
                         <h3 class="text-xl font-bold text-brand-light mb-2">${pub.title}</h3>
                         <p class="text-sm text-brand-light/70 mb-1"><strong>Autores:</strong> ${pub.authors}</p>
                         <p class="text-sm text-brand-light/70 mb-4"><strong>Publicado en:</strong> ${pub.journal}</p>
-                        <a href="${pub.link}" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-accent hover:underline">Ver Publicación &rarr;</a>
+                        <a href="#" data-pdf-url="${pub.link}" class="open-pdf-btn font-semibold text-brand-accent hover:underline">Ver Publicación &rarr;</a>
                     `;
                     publicationsGrid.appendChild(pubEl);
                 });
+                addPublicationEventListeners();
             }
 
             if (blogFilters) {
@@ -322,6 +338,34 @@
                     blogFilters.appendChild(button);
                 });
             }
+            
+            // --- Lógica del Modal ---
+            function openModal(url) {
+                pdfViewer.src = url;
+                pdfModal.classList.remove('hidden');
+            }
+
+            function closeModal() {
+                pdfModal.classList.add('hidden');
+                pdfViewer.src = ''; // Detener la carga del PDF
+            }
+
+            function addPublicationEventListeners() {
+                document.querySelectorAll('.open-pdf-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const url = btn.dataset.pdfUrl;
+                        openModal(url);
+                    });
+                });
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            pdfModal.addEventListener('click', (e) => {
+                if (e.target === pdfModal) {
+                    closeModal();
+                }
+            });
 
             // --- Lógica de Navegación SPA ---
             const navLinks = document.querySelectorAll('.nav-link');
