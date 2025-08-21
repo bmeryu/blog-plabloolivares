@@ -181,7 +181,7 @@
         <section id="blog" class="page-section">
             <div class="container mx-auto px-6 py-20">
                 <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll">Blog & Reflexiones</h2>
-                <p class="text-center text-brand-light/70 mb-10 animate-on-scroll" style="transition-delay: 150ms;">Ideas y análisis sobre tecnología, liderazgo y el futuro de la IA.</p>
+                <p class="text-center text-brand-light/70 mb-10 animate-on-scroll" style="transition-delay: 150ms;">Ideas y análisis sobre tecnología, liderazgo y el futuro de la IA, basados en la investigación y la experiencia.</p>
                 <div id="blog-filters" class="flex flex-wrap justify-center gap-2 mb-12 animate-on-scroll" style="transition-delay: 300ms;">
                     <!-- Los botones de filtro se insertarán aquí -->
                 </div>
@@ -258,8 +258,9 @@
     <!-- PDF Modal -->
     <div id="pdf-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="bg-brand-dark w-full h-full max-w-4xl max-h-[90vh] rounded-lg shadow-xl flex flex-col">
-            <div class="flex justify-end p-2">
-                <button id="close-modal-btn" class="text-brand-light hover:text-white">&times;</button>
+            <div class="flex justify-between items-center p-4 border-b border-brand-secondary/20">
+                <h3 id="modal-title" class="text-lg font-bold"></h3>
+                <button id="close-modal-btn" class="text-2xl font-bold text-brand-light hover:text-white">&times;</button>
             </div>
             <div class="flex-grow p-2 sm:p-4">
                 <iframe id="pdf-viewer" class="w-full h-full border-0 rounded-b-lg" src=""></iframe>
@@ -271,10 +272,24 @@
         document.addEventListener('DOMContentLoaded', function() {
             // --- Datos ---
             const articles = [
-                { category: 'Arquitectura', title: 'Microservicios vs. Monolitos: La Decisión Estratégica que tu CTO debe tomar', description: 'Análisis de costos, escalabilidad y gobierno de la seguridad en arquitecturas Cloud Native (GCP/AWS).', imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Arquitectura' },
-                { category: 'Liderazgo', title: 'El Rol del CTO en la Transformación Digital: Más Allá del Código', description: 'Cómo alinear la visión tecnológica con los objetivos del negocio para generar un impacto real y medible.', imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Liderazgo' },
-                { category: 'Seguridad', title: 'Gobierno de la Seguridad en la Nube: Un Enfoque Pragmático', description: 'Implementación de políticas y herramientas para proteger los activos de la empresa en entornos cloud.', imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Seguridad' },
-                { category: 'Python', title: 'Creando Pipelines de Datos Escalables con Python y GCP', description: 'Una guía paso a paso para construir sistemas de procesamiento de datos robustos y eficientes.', imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Python' }
+                { 
+                    category: 'Inteligencia Artificial', 
+                    title: '¿Puede una IA detectar Fake News en español? Un vistazo a nuestro paper', 
+                    description: 'Traducimos nuestro paper de la SCCC 2023. Explicamos cómo entrenamos un modelo de Deep Learning para identificar noticias falsas y los desafíos que encontramos.', 
+                    imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Fake+News+AI' 
+                },
+                { 
+                    category: 'Deep Learning', 
+                    title: 'Construyendo un nuevo modelo de Deep Learning: De la idea a la publicación', 
+                    description: 'Un recorrido por el proceso de diseño y validación de un nuevo modelo para la detección de noticias falsas, basado en nuestra publicación en ICA-ACCA 2023.', 
+                    imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Deep+Learning' 
+                },
+                { 
+                    category: 'Arquitectura', 
+                    title: 'Microservicios vs. Monolitos: La Decisión Estratégica que tu CTO debe tomar', 
+                    description: 'Análisis de costos, escalabilidad y gobierno de la seguridad en arquitecturas Cloud Native (GCP/AWS), basado en más de 10 años de experiencia.', 
+                    imageUrl: 'https://placehold.co/600x400/1a202c/e2e8f0?text=Arquitectura' 
+                }
             ];
 
             const publications = [
@@ -290,6 +305,7 @@
             const pdfModal = document.getElementById('pdf-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
             const pdfViewer = document.getElementById('pdf-viewer');
+            const modalTitle = document.getElementById('modal-title');
             
             // --- Lógica para renderizar ---
             function renderArticles(filter = 'Todos') {
@@ -315,7 +331,7 @@
                         <h3 class="text-xl font-bold text-brand-light mb-2">${pub.title}</h3>
                         <p class="text-sm text-brand-light/70 mb-1"><strong>Autores:</strong> ${pub.authors}</p>
                         <p class="text-sm text-brand-light/70 mb-4"><strong>Publicado en:</strong> ${pub.journal}</p>
-                        <a href="#" data-pdf-url="${pub.link}" class="open-pdf-btn font-semibold text-brand-accent hover:underline">Ver Publicación &rarr;</a>
+                        <a href="#" data-pdf-url="${pub.link}" data-title="${pub.title}" class="open-pdf-btn font-semibold text-brand-accent hover:underline">Ver Publicación &rarr;</a>
                     `;
                     publicationsGrid.appendChild(pubEl);
                 });
@@ -340,14 +356,16 @@
             }
             
             // --- Lógica del Modal ---
-            function openModal(url) {
+            function openModal(url, title) {
                 pdfViewer.src = url;
+                modalTitle.textContent = title;
                 pdfModal.classList.remove('hidden');
             }
 
             function closeModal() {
                 pdfModal.classList.add('hidden');
                 pdfViewer.src = ''; // Detener la carga del PDF
+                modalTitle.textContent = '';
             }
 
             function addPublicationEventListeners() {
@@ -355,7 +373,8 @@
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
                         const url = btn.dataset.pdfUrl;
-                        openModal(url);
+                        const title = btn.dataset.title;
+                        openModal(url, title);
                     });
                 });
             }
